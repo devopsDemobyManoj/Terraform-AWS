@@ -10,7 +10,8 @@ pipeline {
 
    agent  any
     stages {
-        steps {
+        stage('checkout') {
+            steps {
                  script{
                         dir("terraform")
                         {
@@ -19,6 +20,7 @@ pipeline {
                     }
                 }
             }
+
         stage('Plan') {
             steps {
                 sh 'pwd;cd terraform/ ; terraform init'
