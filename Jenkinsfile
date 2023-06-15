@@ -10,17 +10,6 @@ pipeline {
 
    agent  any
     stages {
-        stage('checkout') {
-            steps {
-                 script{
-                        dir("terraform")
-                        {
-                            git "https://github.com/devopsDemobyManoj/Terraform-AWS.git"
-                        }
-                    }
-                }
-            }
-
         stage('Plan') {
             steps {
                 sh 'pwd;cd terraform/ ; terraform init'
