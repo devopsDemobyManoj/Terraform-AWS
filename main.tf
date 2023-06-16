@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "ec2" {
-  ami           = "ami-05fa00d4c63e32376" # us-west-2
+  ami           = "ami-0e820afa569e84cc1" #us-east-2
   instance_type = "t2.micro"
   tags = {
       Name = "Terraform-Demo"
