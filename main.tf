@@ -1,11 +1,19 @@
-provider "aws" {
-    region = "us-east-2"  
+module "networking" {
+  source    = "./modules/networking"
+  namespace = var.namespace
 }
 
-resource "aws_instance" "ec2" {
-  ami           = "ami-0e820afa569e84cc1" #us-east-2
-  instance_type = "t2.micro"
-  tags = {
-      Name = "Terraform-Demo"
-  }
+module "ssh-key" {
+  source    = "./modules/ssh-key"
+  namespace = var.namespace
 }
+
+module "ec2" {
+  source     = "./modules/ec2"
+  namespace  = var.namespace
+  vpc        = module.networking.vpc
+  sg_pub_id  = module.networking.sg_pub_id
+  sg_priv_id = module.networking.sg_priv_id
+  key_name   = module.ssh-key.key_name
+}
+
