@@ -5,5 +5,5 @@ resource "aws_instance" "ec2" {
       Name = "Terraform-Ansible"
   }
   key_name = "jenkinsDemo"
-  security_groups = "sg-0d7515bee459b60fc"
+  security_groups = ["sg-0d7515bee459b60fc"]
 }
