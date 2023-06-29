@@ -20,8 +20,3 @@
         name: httpd
         enabled: true
         state: started
-    - name: Configure firewall for HTTP traffic
-      ansible.posix.shell:
-        cmd: >
-          firewall-cmd --add-service=http --permanent &&
-          firewall-cmd --reload
