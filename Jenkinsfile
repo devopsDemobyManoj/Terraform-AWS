@@ -55,6 +55,7 @@ pipeline {
                 always {
                     script {
                         aws_server_ip = sh(returnStdout: true, script: 'cd terraform/ && terraform output -raw public_ip').trim()
+                        echo "The captured IP is: ${aws_server_ip}"
                     }
                 }
             }
