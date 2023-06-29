@@ -66,7 +66,7 @@ pipeline {
                     
                         // Get SSH key from Jenkins credentials
                         def privateKeyPath = "${env.JENKINS_HOME}/jenkinsDemo.pem"
-                    
+                        env.server_ip = publicIP
                         // Execute Ansible playbook
                         sh "ansible-playbook -i inventory.ini httpd.yml"
                         
