@@ -57,8 +57,8 @@ pipeline {
             }
         }
         stage('ansible') {
-            dir('terraform') {
-                steps {
+            steps {
+                dir('terraform') {
                     // Retrieve output variable from the previous stage
                     script {
                         def outputValue = sh(returnStdout: true, script: 'terraform output -raw public_ip').trim()
