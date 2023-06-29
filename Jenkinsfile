@@ -48,10 +48,9 @@ pipeline {
         }
 
         stage('terraform apply') {
-        steps {
-            sh """
-                cd terraform/ ; terraform apply
-            """
+            steps {
+                    sh "pwd;cd terraform/ ; terraform apply -input=false tfplan"
+                }
             script {
                 aws_server_ip = sh(returnStdout: true, script: 'cd terraform/ && terraform output -raw public_ip').trim()
                     }
