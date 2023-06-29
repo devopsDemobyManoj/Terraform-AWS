@@ -46,11 +46,12 @@ pipeline {
         }
 
         stage('terraform apply') {
-            environment {
-                TERRAFORM_OUTPUT = sh(returnStdout: true, script: 'cd terraform/ && terraform apply -auto-approve -input=false -no-color tfplan | tee tfoutput.txt | awk \'/public_ip/ {print $NF}\'').trim()
-            }
             steps {
-                sh 'cat terraform/tfoutput.txt'
+                sh "pwd;cd terraform/ ; terraform apply -auto-approve -input=false -no-color tfplan | tee tfoutput.txt"
+                script {
+                    aws_server_ip = readFile('terraform/tfoutput.txt').readLines().find { it =~ /public_ip\s+=/ }.split('=')[1].trim()
+                    echo "The captured IP is: ${aws_server_ip}"
+                }
             }
         }
 
