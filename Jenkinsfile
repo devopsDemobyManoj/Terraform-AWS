@@ -56,5 +56,24 @@ pipeline {
                 }
             }
         }
+        stage('ansible') {
+            dir('terraform') {
+                steps {
+                    // Retrieve output variable from the previous stage
+                    script {
+                        def outputValue = sh(returnStdout: true, script: 'terraform output -raw public_ip').trim()
+    
+                        // Get SSH key from Jenkins credentials
+                        def sshKey = credentials('s3096090d-3385-483b-b880-3a58dbf64b46')
+    
+                        // Generate inventory file
+                        writeFile file: 'inventory.ini', text: "server ansible_host=${outputValue} ansible_ssh_private_key_file=${sshKey}"
+                    }
+    
+                    // Execute Ansible playbook
+                    sh 'ansible-playbook -i inventory.ini httpd.yml'
+                }
+            }
+        }
     }
 }
