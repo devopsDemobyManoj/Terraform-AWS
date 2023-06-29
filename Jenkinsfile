@@ -46,14 +46,14 @@ pipeline {
     
         stage('terraform apply') {
          sh """
-            terraform apply
+            cd terraform/ ; terraform apply
          """
          aws_server_ip = sh(returnStdout: true, script: "terraform output public_ip").trim()
          
           }
         stage('ansible') {
          sh """
-           ansible-playbook release.yml --extra-vars "DD_IP=${dd_ip}"
+           cd terraform ; ansible-playbook -i aws_server_ip httpd.yml
          """
           }
         
