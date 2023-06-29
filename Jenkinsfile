@@ -70,10 +70,8 @@ pipeline {
             
                 // Execute Ansible playbook
                 sh "ansible-playbook -i ${publicIP} -e 'ansible_ssh_private_key_file=${sshKey}' httpd.yml"
-                    }
-
-                }
             }
+
         }
     }
 }
