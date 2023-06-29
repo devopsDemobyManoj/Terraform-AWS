@@ -50,7 +50,7 @@ pipeline {
             steps {
                 dir('terraform') {
                     script {
-                        def outputValue = sh(returnStdout: true, script: "terraform output -raw variable_name").trim()
+                        def outputValue = sh(returnStdout: true, script: "terraform output -raw public_ip").trim()
                         echo "Output Variable Value: ${outputValue}"
                     }
                 }
