@@ -55,7 +55,6 @@ pipeline {
                 aws_server_ip = sh(returnStdout: true, script: 'cd terraform/ && terraform output -raw public_ip').trim()
                     }
                 }
-            }
 
 
         stage('ansible') {
@@ -66,4 +65,4 @@ pipeline {
             }
         }
     }
-}
+
