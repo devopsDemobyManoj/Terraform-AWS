@@ -67,6 +67,8 @@ pipeline {
                         // Get SSH key from Jenkins credentials
                         def privateKeyPath = "${env.JENKINS_HOME}/jenkinsDemo.pem"
                         env.server_ip = publicIP
+                        def fileContent = sh(returnStdout: true, script: "terraform output")
+                        writeFile file: "${WORKSPACE/vars.tml}", text: fileContent
                         // Execute Ansible playbook
                         sh "ansible-playbook -i inventory.ini -e "server_ip=${server_ip}" httpd.yml"
                         
