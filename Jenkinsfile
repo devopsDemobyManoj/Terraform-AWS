@@ -52,7 +52,10 @@ pipeline {
                 sh """
                     cd terraform/ ; terraform apply
                 """
-                aws_server_ip = sh(returnStdout: true, script: 'cd terraform/ && terraform output -raw public_ip').trim()
+                
+            }
+            script {
+            aws_server_ip = sh(returnStdout: true, script: 'cd terraform/ && terraform output -raw public_ip').trim()
             }
         }
 
