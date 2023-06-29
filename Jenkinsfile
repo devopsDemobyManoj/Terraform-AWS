@@ -68,7 +68,7 @@ pipeline {
                         def privateKeyPath = "${env.JENKINS_HOME}/jenkinsDemo.pem"
                         env.server_ip = publicIP
                         // Execute Ansible playbook
-                        sh "ansible-playbook -i inventory.ini httpd.yml"
+                        sh "ansible-playbook -i inventory.ini -e "server_ip=${server_ip}" httpd.yml"
                         
                     }
                 }
