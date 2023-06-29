@@ -52,6 +52,8 @@ pipeline {
                 sh "pwd;cd terraform/ ; terraform apply -auto-approve -input=false -no-color tfplan | tee tfoutput.txt"
                 script {
                     def tfOutput = readFile('terraform/tfoutput.txt')
+                    echo "Terraform Output:"
+                    echo tfOutput
                     aws_server_ip = tfOutput =~ /public_ip\s+=\s+(.*)/ ? tfOutput[0][1].trim() : null
                     if (aws_server_ip) {
                         echo "The captured IP is: ${aws_server_ip}"
