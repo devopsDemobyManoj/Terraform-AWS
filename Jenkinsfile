@@ -66,15 +66,10 @@ pipeline {
 
                         // Get SSH key from Jenkins credentials
                         def sshKey = credentials('s3096090d-3385-483b-b880-3a58dbf64b46')
-                    
-
-                        // Update variables in pipeline
-                        env.server_ip = publicIP
-                        env.key_path = sshKey
                     }
     
                     // Execute Ansible playbook
-                    sh 'ansible-playbook -i inventory.ini httpd.yml'
+                    sh "ansible-playbook -i ${publicIP} -e 'ansible_ssh_private_key_file=${sshKey}' playbook.yml
                 }
             }
         }
