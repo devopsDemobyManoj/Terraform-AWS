@@ -67,6 +67,12 @@ pipeline {
                         // Get SSH key from Jenkins credentials
                         def privateKeyPath = "${env.JENKINS_HOME}/jenkinsDemo.pem"
                         env.server_ip = publicIP
+
+                        def publicIP = sh(returnStdout: true, script: 'terraform output -raw public_ip').trim()
+                        echo "Output Variable Value: ${publicIP}"
+                    
+                        // Update inventory file with public IP
+                        sh "sed -i 's/{{ publicIP }}/${publicIP}/' inventory.ini"
                     
                         // Write Terraform output to vars.yml file
                         def fileContent = sh(returnStdout: true, script: "terraform output")
