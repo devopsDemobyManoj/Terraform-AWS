@@ -52,11 +52,13 @@ pipeline {
                     def tfOutput = readFile('terraform/tfoutput.txt')
                     echo "Terraform Output:"
                     echo tfOutput
-                    aws_server_ip = tfOutput =~ /public_ip\s+=\s+(.*)/ ? tfOutput[0][1].trim() : null
-                    if (aws_server_ip) {
+                    def regexPattern = /public_ip\s+=\s+(.*)/
+                    def match = tfOutput =~ regexPattern
+                    if (match) {
+                        aws_server_ip = match[0][1].trim()
                         echo "The captured IP is: ${aws_server_ip}"
                     } else {
-                        error("Failed to capture IP address.")
+                        error("Failed to capture IP address. No match found for pattern: ${regexPattern.pattern()}")
                     }
                 }
             }
