@@ -48,16 +48,16 @@ pipeline {
         }
 
         stage('terraform apply') {
-            steps {
-                sh """
-                    cd terraform/ ; terraform apply
-                """
-                
-            }
+        steps {
+            sh """
+                cd terraform/ ; terraform apply
+            """
             script {
-            aws_server_ip = sh(returnStdout: true, script: 'cd terraform/ && terraform output -raw public_ip').trim()
+                aws_server_ip = sh(returnStdout: true, script: 'cd terraform/ && terraform output -raw public_ip').trim()
+                    }
+                }
             }
-        }
+
 
         stage('ansible') {
             steps {
