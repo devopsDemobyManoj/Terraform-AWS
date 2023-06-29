@@ -66,7 +66,7 @@ pipeline {
                     
                         // Get SSH key from Jenkins credentials
                         def sshKey = ''
-                        withCredentials([sshUserPrivateKey(credentialsId: 's3096090d-3385-483b-b880-3a58dbf64b46', keyFileVariable: 'sshKey')]) {
+                        withCredentials([sshUserPrivateKey(credentialsId: '3096090d-3385-483b-b880-3a58dbf64b46	', keyFileVariable: 'sshKey')]) {
                             echo "Output Variable Value: ${sshKey}"
                         }
                     
