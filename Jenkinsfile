@@ -1,4 +1,5 @@
 def aws_server_ip
+
 pipeline {
     agent any
 
@@ -50,17 +51,26 @@ pipeline {
             steps {
                 sh "pwd;cd terraform/ ; terraform apply -auto-approve -input=false -no-color tfplan | tee tfoutput.txt"
                 script {
-                    aws_server_ip = readFile('terraform/tfoutput.txt').readLines().find { it =~ /public_ip\s+=/ }.split('=')[1].trim()
-                    echo "The captured IP is: ${aws_server_ip}"
+                    def tfOutput = readFile('terraform/tfoutput.txt')
+                    aws_server_ip = tfOutput =~ /public_ip\s+=\s+(.*)/ ? tfOutput[0][1].trim() : null
+                    if (aws_server_ip) {
+                        echo "The captured IP is: ${aws_server_ip}"
+                    } else {
+                        error("Failed to capture IP address.")
+                    }
                 }
             }
         }
 
         stage('ansible') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: '3096090d-3385-483b-b880-3a58dbf64b46	', keyFileVariable: 'SSH_PRIVATE_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'your-credentials-id', keyFileVariable: 'SSH_PRIVATE_KEY')]) {
                     script {
-                        writeFile file: 'inventory.ini', text: "[webserver]\n${aws_server_ip} ansible_user=ec2-user ansible_ssh_private_key_file=${env.SSH_PRIVATE_KEY}"
+                        if (aws_server_ip) {
+                            writeFile file: 'inventory.ini', text: "[webserver]\n${aws_server_ip} ansible_user=ec2-user ansible_ssh_private_key_file=${env.SSH_PRIVATE_KEY}"
+                        } else {
+                            error("IP address not available. Unable to generate inventory file.")
+                        }
                     }
                 }
                 sh """
