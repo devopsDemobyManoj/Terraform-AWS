@@ -4,21 +4,25 @@
   vars:
     project_root: /var/www/html
   tasks:  
-  - name: httpd installed
-    ansible.builtin.yum:
-      name: httpd
-      state: latest
-  - name: Place the index file at project root
-    copy: src=index.html dest={{ project_root }}/index.html owner=apache group=apache mode=0644
-  - name: httpd service enabled
-    ansible.builtin.service:
-      name: httpd
-      enabled: true
-      state: started
-  - name: open firewall
-    ansible.posix.firewalld:
-      service: http
-      state: enabled
-      immediate: true
-      permanent: true
-
+    - name: httpd installed
+      ansible.builtin.dnf:
+        name: httpd
+        state: latest
+    - name: Place the index file at project root
+      copy: 
+        src: index.html 
+        dest: "{{ project_root }}/index.html"
+        owner: apache 
+        group: apache 
+        mode: "0644"
+    - name: httpd service enabled
+      ansible.builtin.service:
+        name: httpd
+        enabled: true
+        state: started
+    - name: open firewall
+      ansible.posix.firewalld:
+        service: http
+        state: enabled
+        immediate: true
+        permanent: true
