@@ -46,18 +46,22 @@ pipeline {
            }
         }
         stage('terraform apply') {
-         sh """
-            cd terraform/ ; terraform apply
-         """
-         aws_server_ip = sh(returnStdout: true, script: "terraform output public_ip").trim()
+            steps {
+                 sh """
+                    cd terraform/ ; terraform apply
+                 """
+                 aws_server_ip = sh(returnStdout: true, script: "terraform output public_ip").trim()
+            }
          
           }
         
         
         stage('ansible') {
-         sh """
-           cd terraform ; ansible-playbook -i aws_server_ip httpd.yml
-         """
+            steps {
+                 sh """
+                   cd terraform ; ansible-playbook -i aws_server_ip httpd.yml
+                 """
+            }
           }
            
        }
