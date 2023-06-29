@@ -1,5 +1,3 @@
-def aws_server_ip
-
 pipeline {
     agent any
 
@@ -48,23 +46,18 @@ pipeline {
         }
 
         stage('terraform apply') {
-            steps {
-                sh "pwd;cd terraform/ ; terraform apply -input=false tfplan"
+            environment {
+                TERRAFORM_OUTPUT = sh(returnStdout: true, script: 'cd terraform/ && terraform apply -auto-approve -input=false -no-color tfplan | tee tfoutput.txt | awk \'/public_ip/ {print $NF}\'').trim()
             }
-            post {
-                always {
-                    script {
-                        aws_server_ip = sh(returnStdout: true, script: 'cd terraform/ && terraform output -raw public_ip').trim()
-                        echo "The captured IP is: ${aws_server_ip}"
-                    }
-                }
+            steps {
+                sh 'cat terraform/tfoutput.txt'
             }
         }
 
         stage('ansible') {
             steps {
                 sh """
-                    cd terraform ; ansible-playbook -i ${aws_server_ip} httpd.yml
+                    cd terraform ; ansible-playbook -i ${env.TERRAFORM_OUTPUT} httpd.yml
                 """
             }
         }
