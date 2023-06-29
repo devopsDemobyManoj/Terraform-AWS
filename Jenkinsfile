@@ -61,15 +61,16 @@ pipeline {
                 dir('terraform') {
                     // Retrieve output variable from the previous stage
                     script {
-                    // Fetch Terraform output
-                    def serverIp = sh(returnStdout: true, script: 'terraform output -raw public_ip').trim()
+                        // Fetch Terraform output
+                         def publicIP = sh(returnStdout: true, script: 'terraform output -raw public_ip').trim()
 
-                    // Fetch Jenkins credentials
-                    def privateKey = credentials('ec2-user')
+                        // Get SSH key from Jenkins credentials
+                        def sshKey = credentials('s3096090d-3385-483b-b880-3a58dbf64b46')
+                    
 
-                    // Update variables in pipeline
-                    env.server_ip = serverIp
-                    env.key_path = privateKey
+                        // Update variables in pipeline
+                        env.server_ip = publicIP
+                        env.key_path = sshKey
                     }
     
                     // Execute Ansible playbook
