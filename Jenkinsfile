@@ -1,5 +1,6 @@
 pipeline {
 
+    def aws_server_ip
     parameters {
         booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
     } 
@@ -27,29 +28,40 @@ pipeline {
                 sh 'pwd;cd terraform/ ; terraform init'
                 sh "pwd;cd terraform/ ; terraform plan -out tfplan"
                 sh 'pwd;cd terraform/ ; terraform show -no-color tfplan > tfplan.txt'
-            }
-        }
+                    }
+                }
+            steps {
+                   script {
+                        def plan = readFile 'terraform/tfplan.txt'
+                        input message: "Do you want to apply the plan?",
+                        parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+                   }
+               }
         stage('Approval') {
            when {
                not {
                    equals expected: true, actual: params.autoApprove
                }
            }
-
-           steps {
-               script {
-                    def plan = readFile 'terraform/tfplan.txt'
-                    input message: "Do you want to apply the plan?",
-                    parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-               }
-           }
+    
+        stage('terraform apply') {
+         sh """
+            terraform apply
+         """
+         aws_server_ip = sh(returnStdout: true, script: "terraform output DDVE_public_IP").trim()
+         
+          }
+          stage('ansible') {
+             sh """
+               ansible-playbook release.yml --extra-vars "DD_IP=${dd_ip}"
+             """
+              }
+        
+            }
+           
        }
 
-        stage('Apply') {
-            steps {
-                sh "pwd;cd terraform/ ; terraform apply -input=false tfplan"
-            }
-        }
+
     }
 
   }
