@@ -58,8 +58,13 @@ pipeline {
 
         stage('ansible') {
             steps {
+                withCredentials([sshUserPrivateKey(credentialsId: '3096090d-3385-483b-b880-3a58dbf64b46	', keyFileVariable: 'SSH_PRIVATE_KEY')]) {
+                    script {
+                        writeFile file: 'inventory.ini', text: "[webserver]\n${aws_server_ip} ansible_user=ec2-user ansible_ssh_private_key_file=${env.SSH_PRIVATE_KEY}"
+                    }
+                }
                 sh """
-                    cd terraform ; ansible-playbook -i ${env.TERRAFORM_OUTPUT} httpd.yml
+                    cd terraform ; ansible-playbook -i inventory.ini httpd.yml
                 """
             }
         }
