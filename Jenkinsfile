@@ -48,14 +48,14 @@ pipeline {
          sh """
             terraform apply
          """
-         aws_server_ip = sh(returnStdout: true, script: "terraform output DDVE_public_IP").trim()
+         aws_server_ip = sh(returnStdout: true, script: "terraform output public_ip").trim()
          
           }
-          stage('ansible') {
-             sh """
-               ansible-playbook release.yml --extra-vars "DD_IP=${dd_ip}"
-             """
-              }
+        stage('ansible') {
+         sh """
+           ansible-playbook release.yml --extra-vars "DD_IP=${dd_ip}"
+         """
+          }
         
             }
            
@@ -63,5 +63,3 @@ pipeline {
 
 
     }
-
-  }
