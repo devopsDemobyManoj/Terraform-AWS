@@ -52,7 +52,7 @@ pipeline {
                     def tfOutput = readFile('terraform/tfoutput.txt')
                     echo "Terraform Output:"
                     echo tfOutput
-                    def regexPattern = /public_ip\s+=\s+(.*)/
+                    def regexPattern = /public_ip\s+=\s+\"(\d+\.\d+\.\d+\.\d+)\"/
                     def match = tfOutput =~ regexPattern
                     if (match) {
                         aws_server_ip = match[0][1].trim()
@@ -67,16 +67,11 @@ pipeline {
         stage('ansible') {
             steps {
                 script {
-                    def public_ip = sh(
-                        returnStdout: true,
-                        script: 'cd terraform ; terraform output -json tfoutput.txt | jq -r \'.public_ip\''
-                    ).trim()
-
-                    if (public_ip) {
+                    if (aws_server_ip) {
                         withCredentials([sshUserPrivateKey(credentialsId: 'your-credentials-id', keyFileVariable: 'SSH_PRIVATE_KEY')]) {
                             sh """
                                 echo "[webserver]" > inventory.ini
-                                echo "$public_ip ansible_user=ec2-user ansible_ssh_private_key_file=${env.SSH_PRIVATE_KEY}" >> inventory.ini
+                                echo "$aws_server_ip ansible_user=ec2-user ansible_ssh_private_key_file=${env.SSH_PRIVATE_KEY}" >> inventory.ini
                             """
                         }
                         sh "cd terraform ; ansible-playbook -i inventory.ini httpd.yml"
