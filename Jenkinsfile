@@ -70,7 +70,7 @@ pipeline {
                         def fileContent = sh(returnStdout: true, script: "terraform output")
                         writeFile file: "${WORKSPACE/vars.tml}", text: fileContent
                         // Execute Ansible playbook
-                        sh "ansible-playbook -i inventory.ini -e "server_ip=${server_ip}" httpd.yml"
+                        sh "ansible-playbook -i inventory.ini httpd.yml"
                         
                     }
                 }
