@@ -65,13 +65,10 @@ pipeline {
                         echo "Output Variable Value: ${publicIP}"
                     
                         // Get SSH key from Jenkins credentials
-                        def sshKey = ''
-                        withCredentials([sshUserPrivateKey(credentialsId: '3096090d-3385-483b-b880-3a58dbf64b46	', keyFileVariable: 'sshKey')]) {
-                            echo "Output Variable Value: ${sshKey}"
-                        }
+                        def privateKeyPath = "${env.JENKINS_HOME}/jenkinsDemo.pem"
                     
                         // Execute Ansible playbook
-                        sh "ansible-playbook -i ${publicIP} -e 'ansible_ssh_private_key_file=${sshKey}' httpd.yml"
+                        sh "ansible-playbook -i ${publicIP} --private-key=${privateKeyPath} httpd.yml"
                     }
                 }
             }
