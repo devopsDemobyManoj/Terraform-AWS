@@ -57,20 +57,21 @@ pipeline {
             }
         }
         stage('ansible') {
-            steps {
-                dir('terraform') {
-                    // Retrieve output variable from the previous stage
-                    script {
-                        // Fetch Terraform output
-                        def publicIP = sh(returnStdout: true, script: 'terraform output -raw public_ip').trim()
-                        echo "Output Variable Value: ${publicIP}"
-                        // Get SSH key from Jenkins credentials
-                        def sshKey = credentials('s3096090d-3385-483b-b880-3a58dbf64b46')
-                        echo "Output Variable Value: ${sshKey}"
+            script {
+                // Fetch Terraform output
+                def publicIP = sh(returnStdout: true, script: 'terraform output -raw public_ip').trim()
+                echo "Output Variable Value: ${publicIP}"
+            
+                // Get SSH key from Jenkins credentials
+                def sshKey = ''
+                withCredentials([sshUserPrivateKey(credentialsId: 's3096090d-3385-483b-b880-3a58dbf64b46', keyFileVariable: 'sshKey')]) {
+                    echo "Output Variable Value: ${sshKey}"
+                }
+            
+                // Execute Ansible playbook
+                sh "ansible-playbook -i ${publicIP} -e 'ansible_ssh_private_key_file=${sshKey}' httpd.yml"
                     }
-    
-                    // Execute Ansible playbook
-                    sh "ansible-playbook -i ${publicIP} -e 'ansible_ssh_private_key_file=${sshKey}' httpd.yml"
+
                 }
             }
         }
