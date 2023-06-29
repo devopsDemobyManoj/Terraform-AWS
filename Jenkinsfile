@@ -45,25 +45,24 @@ pipeline {
             }
         }
 
-        stage('terraform apply') {
+        stage('Apply') {
             steps {
-                sh "pwd;cd terraform/ ; terraform apply -auto-approve -input=false -no-color tfplan | tee tfoutput.txt"
-                script {
-                    def tfOutput = readFile('terraform/tfoutput.txt')
-                    echo "Terraform Output:"
-                    echo tfOutput
-                    def regexPattern = /public_ip\s+=\s+\"(\d+\.\d+\.\d+\.\d+)\"/
-                    def match = tfOutput.find(regexPattern)
-                    if (match) {
-                        aws_server_ip = match[1].trim()
-                        echo "The captured IP is: ${aws_server_ip}"
-                    } else {
-                        error("Failed to capture IP address. No match found for pattern: ${regexPattern}")
-                    }
-                }
+                // Apply the Terraform changes
+                sh 'terraform apply -auto-approve -input=false -no-color tfplan'
             }
         }
 
+        stage('Capture Output') {
+            steps {
+                script {
+                    // Capture the output using the 'terraform output' command
+                    aws_server_ip = sh(
+                        returnStdout: true,
+                        script: 'terraform output -json tfoutput.txt | jq -r \'.public_ip\''
+                    ).trim()
+                }
+            }
+        }
         stage('ansible') {
             steps {
                 script {
