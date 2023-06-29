@@ -8,7 +8,10 @@ pipeline {
     stages {
         stage('Fetch Terraform Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/devopsDemobyManoj/Terraform-AWS.git'
+                dir('terraform') {
+                    git branch: 'main', url: 'https://github.com/devopsDemobyManoj/Terraform-AWS.git'
+                }
+                
             }
         }
 
