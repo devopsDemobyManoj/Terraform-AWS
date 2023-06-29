@@ -1,3 +1,4 @@
+def aws_server_ip
 pipeline {
     agent any
 
