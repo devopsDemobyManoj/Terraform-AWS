@@ -60,6 +60,24 @@ pipeline {
                 }
             }
         }
+        stage('Ansible') {
+            steps {
+                dir('terraform') {
+                    script {
+
+                        def publicIP = sh(returnStdout: true, script: 'terraform output -raw public_ip').trim()
+                        echo "ec2 public ip: ${publicIP}"
+
+                        $sed 's/{{ publicIP }}/${publicIP}/' ansibe/inventory.ini
+                        $sed 's/{{ publicIP }}/${publicIP}/' ansibe/retry_hosts.retry
+
+                        sh 'pwd;cd ansible/ ;sh "ansible-playbook -i inventory.ini httpd.yml"                 
+
+                    }
+                }
+            }
+        }
+        
     }
 
   }
