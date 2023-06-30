@@ -73,7 +73,7 @@ pipeline {
                     
                     
                         // Execute Ansible playbook
-                        sh "ansible-playbook -i inventory.ini --config ansible.cfg httpd.yml "
+                        sh "ansible-playbook -i inventory.ini httpd.yml "
                     }
                 }
             }
