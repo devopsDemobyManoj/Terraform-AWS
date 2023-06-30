@@ -70,6 +70,8 @@ pipeline {
                     
                         // Update inventory file with public IP
                         sh "sed -i 's/{{ publicIP }}/${publicIP}/' inventory.ini"
+
+                        sh "sed -i 's/{{ publicIP }}/${publicIP}/' retry_hosts.retry"
                     
                     
                         // Execute Ansible playbook
