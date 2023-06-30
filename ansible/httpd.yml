@@ -1,0 +1,22 @@
+- hosts: all:!localhost
+  remote_user: ec2-user
+  become: true
+  vars:
+    project_root: /var/www/html
+  tasks:  
+    - name: httpd installed
+      ansible.builtin.dnf:
+        name: httpd
+        state: latest
+    - name: Place the index file at project root
+      copy: 
+        src: index.html 
+        dest: "{{ project_root }}/index.html"
+        owner: apache 
+        group: apache 
+        mode: "0644"
+    - name: httpd service enabled
+      ansible.builtin.service:
+        name: httpd
+        enabled: true
+        state: started
