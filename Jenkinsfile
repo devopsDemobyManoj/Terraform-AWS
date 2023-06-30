@@ -50,6 +50,16 @@ pipeline {
                 sh "pwd;cd terraform/ ; terraform apply -input=false tfplan"
             }
         }
+        stage('Fetch Output Variable') {
+            steps {
+                dir('terraform') {
+                    script {
+                        def outputValue = sh(returnStdout: true, script: "terraform output -raw public_ip").trim()
+                        echo "Output Variable Value: ${outputValue}"
+                    }
+                }
+            }
+        }
     }
 
   }
